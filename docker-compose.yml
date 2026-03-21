@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    ports:
+      - "10043:10043"
+    environment:
+      - DATABASE_HOST=postgres
+      - DATABASE_PORT=5432
+      - DATABASE_USER=postgres
+      - DATABASE_PASSWORD=password
+      - DATABASE_NAME=apa_byos_db
+      - PORT=10043
+      - CORS_ORIGIN=http://localhost:9043
+    depends_on:
+      - postgres
+    volumes:
+      - ./uploads:/app/uploads
+
+  frontend:
+    build: ../front
+    ports:
+      - "9043:9043"
+    environment:
+      - NEXT_PUBLIC_API_URL=http://localhost:10043
+    depends_on:
+      - app
+
+  postgres:
+    image: postgres:15
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=apa_byos_db
+    volumes:
+      - ./data/postgres:/var/lib/postgresql/data
